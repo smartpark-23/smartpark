@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMARTPARK - Slots</title>
+
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:'Segoe UI',sans-serif;
+        }
+
+        body{
+            min-height:100vh;
+            background:url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+            position:relative;
+            color:white;
+            padding:30px;
+        }
+
+        body::before{
+            content:"";
+            position:absolute;
+            inset:0;
+            background:rgba(0,0,0,0.65);
+            z-index:0;
+        }
+
+        .container{
+            position:relative;
+            z-index:1;
+            max-width:1200px;
+            margin:auto;
+        }
+
+        h1{
+            text-align:center;
+            font-size:48px;
+            margin-bottom:40px;
+            letter-spacing:2px;
+        }
+
+        .slots-grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+            gap:25px;
+        }
+
+        .slot-card{
+            background:rgba(255,255,255,0.08);
+            backdrop-filter:blur(15px);
+            border-radius:22px;
+            padding:25px;
+            box-shadow:0 8px 25px rgba(0,0,0,0.35);
+            transition:0.3s ease;
+            border:1px solid rgba(255,255,255,0.08);
+        }
+
+        .slot-card:hover{
+            transform:translateY(-6px);
+            box-shadow:0 14px 30px rgba(0,0,0,0.4);
+        }
+
+        .free{
+            border-left:6px solid #22c55e;
+        }
+        .header{
+    position:relative;
+    z-index:1;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:20px 50px;
+    margin-bottom:40px;
+    background:rgba(255,255,255,0.08);
+    backdrop-filter:blur(12px);
+    border-radius:20px;
+}
+
+.logo{
+    font-size:28px;
+    font-weight:700;
+}
+
+.nav-links a{
+    text-decoration:none;
+    color:white;
+    margin-left:18px;
+    padding:10px 16px;
+    border-radius:12px;
+    transition:0.3s;
+}
+
+.nav-links a:hover{
+    background:rgba(255,255,255,0.12);
+}
+
+.register-btn{
+    background:#22c55e;
+}
+
+        .occupied{
+            border-left:6px solid #ef4444;
+        }
+
+        .slot-number{
+            font-size:28px;
+            font-weight:700;
+            margin-bottom:12px;
+        }
+
+        .slot-info{
+            line-height:1.8;
+            color:#e2e8f0;
+            font-size:16px;
+        }
+
+        .status{
+            margin-top:15px;
+            display:inline-block;
+            padding:8px 14px;
+            border-radius:12px;
+            font-weight:600;
+        }
+
+        .status-free{
+            background:rgba(34,197,94,0.18);
+            color:#4ade80;
+        }
+
+        .status-occupied{
+            background:rgba(239,68,68,0.18);
+            color:#f87171;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+ <div class="header">
+    <div class="logo">SMARTPARK</div>
+
+    <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/slots">Slots</a>
+            <a href="/guest-parking">Guest Parking</a>
+            <a href="/guest-access">Track Request</a>
+            <a href="/login">Login</a>
+            <a href="/register" class="register-btn">Register</a>
+        </div>
+</div>
+    <h1>Parking Slots</h1>
+
+    <div class="slots-grid">
+        {% for slot in all_slots %}
+            <div class="slot-card {% if slot.status == 'free' %}free{% else %}occupied{% endif %}">
+
+                <div class="slot-number">
+                    {{ slot.slot_number }}
+                </div>
+
+                <div class="slot-info">
+                    Tower : {{ slot.tower }} <br>
+                    Floor : {{ slot.floor }} <br>
+                    Type : {{ slot.slot_type }}
+                </div>
+
+                <div class="status {% if slot.status == 'free' %}status-free{% else %}status-occupied{% endif %}">
+                    {{ slot.status }}
+                </div>
+
+            </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+</body>
+</html>
