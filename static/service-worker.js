@@ -1,23 +1,9 @@
-const CACHE_NAME = "smartpark-cache-v1";
-
-const urlsToCache = [
-    "/",
-];
-
-self.addEventListener("install", function(event) {
-    event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then(function(cache) {
-                return cache.addAll(urlsToCache);
-            })
-    );
+self.addEventListener("install", (e) => {
+  self.skipWaiting();
 });
 
-self.addEventListener("fetch", function(event) {
-    event.respondWith(
-        caches.match(event.request)
-            .then(function(response) {
-                return response || fetch(event.request);
-            })
-    );
+self.addEventListener("activate", (e) => {
+  caches.keys().then((names) => {
+    for (let name of names) caches.delete(name);
+  });
 });
