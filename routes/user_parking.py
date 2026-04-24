@@ -1,28 +1,49 @@
-from flask import Blueprint, render_template, session, redirect
+from flask import Blueprint, render_template, request, session, redirect
 from db import db
 
 user_parking_bp = Blueprint("user_parking_bp", __name__)
 
-parking_collection = db["parking_slots"]
+slots_collection = db["parking_slots"]
+vehicles_collection = db["vehicles"]
+requests_collection = db["parking_requests"]
 
 
 # =========================
-# PARKING STATUS
+# BOOK PARKING SLOT
 # =========================
-@user_parking_bp.route("/user/parking_status")
-def parking_status():
+@user_parking_bp.route("/user/book_slot", methods=["GET", "POST"])
+def book_slot():
 
     if "user_id" not in session:
         return redirect("/login")
 
     user_name = session["name"]
 
-    slot = parking_collection.find_one({
-        "resident_name": user_name,
-        "status": "occupied"
-    })
+    if request.method == "POST":
+
+        slot_number = request.form.get("slot_number")
+        vehicle_number = request.form.get("vehicle_number")
+
+        # 🔥 insert request (PENDING)
+        requests_collection.insert_one({
+            "resident_name": user_name,
+            "vehicle_number": vehicle_number,
+            "slot_number": slot_number,
+            "status": "pending"
+        })
+
+        return redirect("/user/book_slot")
+
+    # 🔥 ONLY AVAILABLE SLOTS
+    slots = list(slots_collection.find({"status": "available"}))
+
+    # 🔥 user vehicles
+    vehicles = list(vehicles_collection.find({
+        "resident_name": user_name
+    }))
 
     return render_template(
-        "user/parking_status.html",
-        slot=slot
+        "user/book_slot.html",
+        slots=slots,
+        vehicles=vehicles
     )

@@ -7,7 +7,6 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
-
 body{
 background:url("https://images.unsplash.com/photo-1503376780353-7e6692767b70") no-repeat center/cover;
 min-height:100vh;
@@ -36,15 +35,7 @@ padding:30px;
 border-radius:20px;
 width:100%;
 max-width:700px;
-box-shadow:0 10px 30px rgba(0,0,0,0.3);
 color:white;
-}
-
-.header{
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-bottom:20px;
 }
 
 .slot{
@@ -69,39 +60,32 @@ transform:scale(1.05);
 
 <div class="container-box">
 
-<div class="header">
+<div class="d-flex justify-content-between mb-3">
 <h4>🚗 Book Parking Slot</h4>
-<a href="/user/home" class="btn btn-back btn-sm">⬅ Back</a>
+<a href="/user/home" class="btn btn-light btn-sm">⬅ Back</a>
 </div>
 
-<!-- 🔥 FILTER SAME -->
-<form method="GET" class="mb-3">
-<select name="type" class="form-control" onchange="this.form.submit()">
-<option value="">All Slots</option>
-<option value="Car" {% if selected_type == "Car" %}selected{% endif %}>Car</option>
-<option value="Bike" {% if selected_type == "Bike" %}selected{% endif %}>Bike</option>
-</select>
-</form>
-
-<!-- 🔥 SLOT GRID -->
+<!-- SLOT GRID -->
 <div class="row g-3">
 
-{% for slot in slots %}
+{% if slots|length == 0 %}
+<p class="text-center">No slots available</p>
+{% endif %}
 
+{% for slot in slots %}
 <div class="col-md-3">
 <div class="slot"
 onclick="openModal('{{ slot.slot_number }}')">
 {{ slot.slot_number }}
 </div>
 </div>
-
 {% endfor %}
 
 </div>
 
 </div>
 
-<!-- 🔥 MODAL (NEW ADD) -->
+<!-- MODAL -->
 <div class="modal fade" id="bookModal">
 <div class="modal-dialog">
 <div class="modal-content">
@@ -148,16 +132,12 @@ Cancel
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-
 function openModal(slot){
-
 document.getElementById("slotName").innerText = slot;
 document.getElementById("slotInput").value = slot;
 
 new bootstrap.Modal(document.getElementById('bookModal')).show();
-
 }
-
 </script>
 
 </body>
