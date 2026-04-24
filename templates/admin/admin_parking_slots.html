@@ -14,7 +14,6 @@ background:url("https://images.unsplash.com/photo-1518306727298-4c17e1bf6942") c
 min-height:100vh;
 position:relative;
 }
-
 body::before{
 content:"";
 position:absolute;
@@ -26,7 +25,6 @@ background:rgba(0,0,0,0.65);
 z-index:0;
 }
 
-/* SIDEBAR */
 .sidebar{
 height:100vh;
 width:230px;
@@ -36,136 +34,50 @@ backdrop-filter:blur(15px);
 padding-top:25px;
 z-index:1;
 }
-
-.sidebar h4{
-text-align:center;
-margin-bottom:30px;
-color:white;
-}
-
+.sidebar h4{ text-align:center; color:white; }
 .sidebar a{
-display:block;
-padding:12px 20px;
-color:white;
-text-decoration:none;
-border-radius:8px;
-margin:5px 10px;
-transition:0.3s;
+display:block; padding:12px 20px; color:white;
+text-decoration:none; border-radius:8px;
+margin:5px 10px; transition:0.3s;
 }
-
 .sidebar a:hover{
 background:linear-gradient(135deg,#86b1e5,#7056ac);
-box-shadow:0 0 15px rgba(99,102,241,0.7);
 padding-left:25px;
 }
 
-/* TOPBAR */
 .topbar{
 margin-left:230px;
 height:65px;
-background:linear-gradient(135deg, #18181a, #2e2443, #270214);
+background:linear-gradient(135deg,#18181a,#2e2443,#270214);
 color:white;
 display:flex;
 align-items:center;
 justify-content:space-between;
 padding:0 25px;
-box-shadow:0 5px 20px rgba(0,0,0,0.4);
-z-index:1;
-position:relative;
 }
 
-/* MAIN */
 .main{
 margin-left:230px;
 padding:30px;
-position:relative;
 z-index:1;
+position:relative;
 }
 
-/* CARD */
 .card-box{
 background:rgba(255,255,255,0.15);
 backdrop-filter:blur(12px);
 padding:20px;
 border-radius:20px;
-box-shadow:0 10px 30px rgba(0,0,0,0.3);
 color:white;
-}
-
-/* ADD BUTTON */
-.btn-add{
-background:linear-gradient(135deg,#22c55e,#16a34a);
-color:white;
-border:none;
-border-radius:20px;
-padding:8px 18px;
-transition:0.3s;
-}
-
-.btn-add:hover{
-transform:scale(1.05);
-box-shadow:0 0 15px rgba(34,197,94,0.7);
-}
-
-/* SLOT GRID */
-.slot-grid{
-display:grid;
-grid-template-columns:repeat(6,1fr);
-gap:10px;
 margin-bottom:20px;
 }
 
-/* SLOT BOX */
-.slot-box{
-padding:15px;
-text-align:center;
-border-radius:10px;
-font-weight:bold;
-cursor:pointer;
-transition:0.3s;
-}
+.table{ color:white; }
+.table th{ background:rgba(255,255,255,0.2); }
 
-/* FREE */
-.slot-box.free{
-background:white;
-color:black;
-}
-
-/* OCCUPIED */
-.slot-box.occupied{
-background:red;
-color:white;
-}
-
-/* PENDING */
-.slot-box.pending{
-background:yellow;
-color:black;
-}
-
-/* HOVER */
-.slot-box:hover{
-transform:scale(1.08);
-}
-
-/* TABLE */
-.table{
-color:white;
-}
-
-.table th{
-background:rgba(255,255,255,0.2);
-}
-
-/* MODAL */
-.modal-content{
-border-radius:18px;
-}
-
-.modal-body p{
-margin-bottom:10px;
-font-size:16px;
-}
+.badge-free{background:#22c55e;}
+.badge-occupied{background:#ef4444;}
+.badge-pending{background:#facc15;color:black;}
 </style>
 </head>
 
@@ -194,182 +106,123 @@ font-size:16px;
 <div>Admin</div>
 </div>
 
-<!-- MAIN -->
 <div class="main">
 
+<!-- 🔝 NORMAL SLOTS -->
 <div class="card-box">
 
 <div class="d-flex justify-content-between mb-3">
-<h4>Parking Slots Layout</h4>
+<h4>All Parking Slots</h4>
 
-<a href="/admin/add_parking_slot" class="btn btn-add">
+<a href="/admin/add_parking_slot" class="btn btn-success">
 <i class="fa fa-plus"></i> Add Slot
 </a>
 </div>
 
-<!-- FILTER -->
-<div class="mb-3">
-<select id="typeFilter" class="form-select" onchange="filterSlots()">
-<option value="all">All</option>
-<option value="Car">Car</option>
-<option value="Bike">Bike</option>
-</select>
-</div>
+<table class="table table-bordered text-center align-middle">
 
-<!-- LEGEND -->
-<div class="mb-3">
-<span class="badge bg-light text-dark">Free</span>
-<span class="badge bg-danger">Occupied</span>
-<span class="badge bg-warning text-dark">Pending</span>
-</div>
-
-<!-- TOWER A -->
-<h5>Tower A</h5>
-<div class="slot-grid">
-{% for slot in slots if slot.tower == "A" %}
-<div class="slot-box {% if slot.status == 'occupied' %}occupied{% elif slot.status == 'pending' %}pending{% else %}free{% endif %}"
-data-id="{{ slot._id }}"
-data-number="{{ slot.slot_number }}"
-data-tower="{{ slot.tower }}"
-data-floor="{{ slot.floor }}"
-data-type="{{ slot.slot_type }}"
-data-user="{{ slot.user_name }}"
-data-vehicle="{{ slot.vehicle_number }}"
-onclick="openSlotModal(this)">
-{{ slot.slot_number }}
-</div>
-{% endfor %}
-</div>
-
-<!-- TOWER B -->
-<h5 class="mt-4">Tower B</h5>
-<div class="slot-grid">
-{% for slot in slots if slot.tower == "B" %}
-<div class="slot-box {% if slot.status == 'occupied' %}occupied{% elif slot.status == 'pending' %}pending{% else %}free{% endif %}"
-data-id="{{ slot._id }}"
-data-number="{{ slot.slot_number }}"
-data-tower="{{ slot.tower }}"
-data-floor="{{ slot.floor }}"
-data-type="{{ slot.slot_type }}"
-data-user="{{ slot.user_name }}"
-data-vehicle="{{ slot.vehicle_number }}"
-onclick="openSlotModal(this)">
-{{ slot.slot_number }}
-</div>
-{% endfor %}
-</div>
-
-<!-- GUEST -->
-<h5 class="mt-4">Guest Parking</h5>
-<div class="slot-grid">
-{% for slot in slots if slot.tower == "GUEST" %}
-<div class="slot-box {% if slot.status == 'occupied' %}occupied{% elif slot.status == 'pending' %}pending{% else %}free{% endif %}"
-data-id="{{ slot._id }}"
-data-number="{{ slot.slot_number }}"
-data-tower="{{ slot.tower }}"
-data-floor="{{ slot.floor }}"
-data-type="{{ slot.slot_type }}"
-data-user="{{ slot.user_name }}"
-data-vehicle="{{ slot.vehicle_number }}"
-onclick="openSlotModal(this)">
-{{ slot.slot_number }}
-</div>
-{% endfor %}
-</div>
-
-</div>
-
-<!-- REQUESTS -->
-<div class="card-box mt-4">
-<h4>Pending Requests</h4>
-
-<table class="table">
 <tr>
-<th>Name</th>
-<th>Vehicle</th>
 <th>Slot</th>
+<th>Tower</th>
+<th>Floor</th>
+<th>Type</th>
+<th>User</th>
+<th>Vehicle</th>
+<th>Status</th>
+<th>Action</th>
+</tr>
+
+{% for slot in normal_slots %}
+<tr>
+<td>{{ slot.slot_number }}</td>
+<td>{{ slot.tower }}</td>
+<td>{{ slot.floor }}</td>
+<td>{{ slot.slot_type }}</td>
+<td>{{ slot.user_name or '-' }}</td>
+<td>{{ slot.vehicle_number or '-' }}</td>
+
+<td>
+{% if slot.status == "available" %}
+<span class="badge badge-free">Free</span>
+{% else %}
+<span class="badge badge-occupied">Occupied</span>
+{% endif %}
+</td>
+
+<td>
+<a href="/admin/edit_parking_slot/{{ slot._id }}" class="btn btn-primary btn-sm">
+<i class="fa fa-edit"></i>
+</a>
+
+<a href="/admin/delete_slot/{{ slot._id }}" class="btn btn-danger btn-sm"
+onclick="return confirm('Delete this slot?')">
+<i class="fa fa-trash"></i>
+</a>
+</td>
+
+</tr>
+{% endfor %}
+
+</table>
+
+</div>
+
+<!-- 🔻 PENDING SECTION -->
+<div class="card-box">
+
+<h4>⏳ Pending Approvals</h4>
+
+{% if requests|length == 0 %}
+<p class="text-center">No pending requests</p>
+{% else %}
+
+<table class="table table-bordered text-center align-middle">
+
+<tr>
+<th>Slot</th>
+<th>Resident</th>
+<th>Vehicle</th>
+<th>Status</th>
 <th>Action</th>
 </tr>
 
 {% for r in requests %}
 <tr>
+
+<td>{{ r.slot_number }}</td>
 <td>{{ r.resident_name }}</td>
 <td>{{ r.vehicle_number }}</td>
-<td>{{ r.slot_number }}</td>
+
 <td>
-<a href="/admin/approve/{{ r._id }}" class="btn btn-success btn-sm">Approve</a>
-<a href="/admin/reject/{{ r._id }}" class="btn btn-danger btn-sm">Reject</a>
+<span class="badge badge-pending">Pending</span>
 </td>
+
+<td>
+<a href="/admin/approve/{{ r._id }}" class="btn btn-success btn-sm">
+Approve
+</a>
+
+<a href="/admin/reject/{{ r._id }}" class="btn btn-danger btn-sm">
+Reject
+</a>
+</td>
+
 </tr>
 {% endfor %}
+
 </table>
-</div>
+
+{% endif %}
 
 </div>
 
-<!-- MODAL -->
-<div class="modal fade" id="slotModal" tabindex="-1">
-<div class="modal-dialog">
-<div class="modal-content text-dark">
-
-<div class="modal-header">
-<h5 class="modal-title">Slot Details</h5>
-<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 </div>
 
-<div class="modal-body">
-<p><b>Slot:</b> <span id="m_slot"></span></p>
-<p><b>Tower:</b> <span id="m_tower"></span></p>
-<p><b>Floor:</b> <span id="m_floor"></span></p>
-<p><b>Type:</b> <span id="m_type"></span></p>
-<p><b>User:</b> <span id="m_user"></span></p>
-<p><b>Vehicle:</b> <span id="m_vehicle"></span></p>
-</div>
-
-<div class="modal-footer">
-<a id="editBtn" class="btn btn-primary">
-<i class="fa fa-edit"></i> Edit
-</a>
-<button class="btn btn-dark" data-bs-dismiss="modal">
-<i class="fa fa-arrow-left"></i> Back
-</button>
-</div>
-
-</div>
-</div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
+<!-- AUTO REFRESH -->
 <script>
-function filterSlots(){
-let type = document.getElementById("typeFilter").value;
-let slots = document.querySelectorAll(".slot-box");
-
-slots.forEach(slot=>{
-let slotType = slot.getAttribute("data-type");
-
-if(type === "all" || slotType === type){
-slot.style.display = "block";
-}else{
-slot.style.display = "none";
-}
-});
-}
-
-function openSlotModal(el){
-document.getElementById("m_slot").innerText = el.dataset.number;
-document.getElementById("m_tower").innerText = el.dataset.tower;
-document.getElementById("m_floor").innerText = el.dataset.floor;
-document.getElementById("m_type").innerText = el.dataset.type;
-document.getElementById("m_user").innerText = el.dataset.user || "Free";
-document.getElementById("m_vehicle").innerText = el.dataset.vehicle || "-";
-
-document.getElementById("editBtn").href =
-"/admin/edit_parking_slot/" + el.dataset.id;
-
-new bootstrap.Modal(document.getElementById('slotModal')).show();
-}
+setInterval(function(){
+    location.reload();
+}, 10000);
 </script>
 
 </body>
