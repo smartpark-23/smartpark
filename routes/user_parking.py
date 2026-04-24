@@ -14,23 +14,32 @@ def book_slot():
     if "user_id" not in session:
         return redirect("/login")
 
-    user_name = session["name"]
+    user_name = session.get("name")
 
     # =========================
-    # POST → CREATE REQUEST
+    # POST → SEND REQUEST
     # =========================
     if request.method == "POST":
 
         slot_number = request.form.get("slot_number")
         vehicle_number = request.form.get("vehicle_number")
 
-        # 🔥 slot ne pending kari do
+        # 🔥 duplicate request avoid
+        existing = requests_collection.find_one({
+            "resident_name": user_name,
+            "status": "pending"
+        })
+
+        if existing:
+            return redirect("/user/book_slot")
+
+        # 🔥 slot ne pending karo
         slots_collection.update_one(
             {"slot_number": slot_number},
             {"$set": {"status": "pending"}}
         )
 
-        # 🔥 request insert karo (tamara format ma)
+        # 🔥 request insert
         requests_collection.insert_one({
             "slot_number": slot_number,
             "tower": "",
@@ -49,7 +58,7 @@ def book_slot():
     # =========================
     slots = list(slots_collection.find({"status": "available"}))
 
-    # 🔥 IMPORTANT FIX (owner_name use karo)
+    # 🔥 CORRECT MATCH (IMPORTANT)
     vehicles = list(vehicles_collection.find({
         "owner_name": user_name
     }))
