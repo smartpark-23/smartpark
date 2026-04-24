@@ -8,9 +8,6 @@ vehicles_collection = db["vehicles"]
 requests_collection = db["parking_requests"]
 
 
-# =========================
-# BOOK PARKING SLOT
-# =========================
 @user_parking_bp.route("/user/book_slot", methods=["GET", "POST"])
 def book_slot():
 
@@ -19,27 +16,42 @@ def book_slot():
 
     user_name = session["name"]
 
+    # =========================
+    # POST → CREATE REQUEST
+    # =========================
     if request.method == "POST":
 
         slot_number = request.form.get("slot_number")
         vehicle_number = request.form.get("vehicle_number")
 
-        # 🔥 insert request (PENDING)
+        # 🔥 slot ne pending kari do
+        slots_collection.update_one(
+            {"slot_number": slot_number},
+            {"$set": {"status": "pending"}}
+        )
+
+        # 🔥 request insert karo (tamara format ma)
         requests_collection.insert_one({
-            "resident_name": user_name,
-            "vehicle_number": vehicle_number,
             "slot_number": slot_number,
-            "status": "pending"
+            "tower": "",
+            "resident_name": user_name,
+            "user_id": session["user_id"],
+            "vehicle_number": vehicle_number,
+            "vehicle_type": "",
+            "status": "pending",
+            "request_type": "resident"
         })
 
         return redirect("/user/book_slot")
 
-    # 🔥 ONLY AVAILABLE SLOTS
+    # =========================
+    # ONLY AVAILABLE SLOTS
+    # =========================
     slots = list(slots_collection.find({"status": "available"}))
 
-    # 🔥 user vehicles
+    # 🔥 IMPORTANT FIX (owner_name use karo)
     vehicles = list(vehicles_collection.find({
-        "resident_name": user_name
+        "owner_name": user_name
     }))
 
     return render_template(
