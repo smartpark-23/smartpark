@@ -11,12 +11,12 @@
 
 body{
 font-family:'Segoe UI';
-background:url("https://images.unsplash.com/photo-1493238792000-8113da705763 ") center/cover no-repeat;
+background:url("https://images.unsplash.com/photo-1493238792000-8113da705763") center/cover no-repeat;
 min-height:100vh;
 position:relative;
 }
 
-/* 🔥 DARK OVERLAY */
+/* DARK OVERLAY */
 body::before{
 content:"";
 position:absolute;
@@ -28,46 +28,14 @@ background:rgba(0,0,0,0.6);
 z-index:0;
 }
 
-/* SIDEBAR */
-.sidebar{
-height:100vh;
-width:230px;
-position:fixed;
-background:rgba(255,255,255,0.15);
-backdrop-filter:blur(15px);
-padding-top:25px;
-z-index:1;
-}
-
-.sidebar h4{
-text-align:center;
-margin-bottom:30px;
-color:white;
-}
-
-.sidebar a{
-display:block;
-padding:12px;
-margin:5px 10px;
-border-radius:10px;
-text-decoration:none;
-color:white;
-transition:0.3s;
-}
-
-.sidebar a:hover{
-background:linear-gradient(135deg,#86b1e5,#7056ac);
-box-shadow:0 0 12px rgba(99,102,241,0.8);
-padding-left:25px;
-}
-
 /* MAIN */
 .main{
-margin-left:230px;
-padding:30px;
+padding:40px;
 position:relative;
 z-index:1;
 color:white;
+max-width:1000px;
+margin:auto;
 }
 
 /* BOX */
@@ -92,6 +60,14 @@ transition:0.3s;
 .btn-add:hover{
 transform:scale(1.05);
 box-shadow:0 0 15px rgba(139,92,246,0.7);
+}
+
+/* BACK BUTTON */
+.btn-back{
+background:#ffffff;
+color:black;
+border-radius:20px;
+padding:6px 15px;
 }
 
 /* TABLE */
@@ -123,33 +99,26 @@ box-shadow:0 0 10px rgba(239,68,68,0.8);
 
 <body>
 
-<!-- SIDEBAR -->
-<div class="sidebar">
-<h4>🚗 SmartPark</h4>
-
-<a href="/user/home"><i class="fa fa-home"></i> Dashboard</a>
-<a href="/user/vehicles"><i class="fa fa-car"></i> My Vehicles</a>
-<a href="/user/book_slot"><i class="fa fa-square-parking"></i> Book Slot</a>
-<a href="/user/parking_status"><i class="fa fa-list"></i> Parking Status</a>
-<a href="/user/guest_request"><i class="fa fa-user-plus"></i> Guest Request</a>
-<a href="/user/notifications"><i class="fa fa-bell"></i> Notifications</a>
-<a href="/logout"><i class="fa fa-sign-out"></i> Logout</a>
-</div>
-
 <!-- MAIN -->
 <div class="main">
 
-<div class="d-flex justify-content-between mb-3">
-<h4>🚗 My Vehicles</h4>
+<div class="d-flex justify-content-between align-items-center mb-3">
+
+<a href="/user/home" class="btn btn-back">
+<i class="fa fa-arrow-left"></i> Back
+</a>
+
+<h4 class="m-0">🚗 My Vehicles</h4>
 
 <a href="/user/add_vehicle" class="btn btn-add">
 <i class="fa fa-plus"></i> Add Vehicle
 </a>
+
 </div>
 
 <div class="box">
 
-<table class="table table-hover">
+<table class="table table-hover text-center align-middle">
 
 <thead>
 <tr>
@@ -174,7 +143,9 @@ box-shadow:0 0 10px rgba(239,68,68,0.8);
         <td>{{ v.color }}</td>
 
         <td>
-            <a href="/user/delete_vehicle/{{ v._id }}" class="btn btn-danger btn-sm">
+            <a href="/user/delete_vehicle/{{ v._id }}" 
+               class="btn btn-danger btn-sm"
+               onclick="return confirm('Delete this vehicle?')">
                 <i class="fa fa-trash"></i>
             </a>
         </td>

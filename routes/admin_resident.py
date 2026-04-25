@@ -16,27 +16,38 @@ def manage_residents():
 
 
 # =========================
+from flask import Blueprint, render_template, request, redirect, flash
+from db import db
+
+admin_resident_bp = Blueprint("admin_resident_bp", __name__)
+
+users_collection = db["users"]
+towers_collection = db["towers"]   # 🔥 towers use
+
+
+# =========================
 # ADD RESIDENT
+# =========================
 @admin_resident_bp.route("/admin/add_resident", methods=["GET", "POST"])
 def add_resident():
 
-    # 🔽 Fetch flats from DB
-    flats_data = users_collection.find()
-    flats = [f.get("flat") for f in flats_data]
+    # 🔥 Fetch towers (A / B)
+    towers_data = towers_collection.find()
+    towers = [t.get("tower") for t in towers_data]
 
     if request.method == "POST":
 
         name = request.form.get("name")
         email = request.form.get("email")
         phone = request.form.get("phone")
-        flat = request.form.get("flat")
+        tower = request.form.get("tower")   # 🔥 flat → tower
 
         # ✅ Validation
-        if not name or not email or not phone or not flat:
+        if not name or not email or not phone or not tower:
             flash("All fields are required!", "danger")
             return redirect("/admin/add_resident")
 
-        # ✅ Duplicate email check
+        # ✅ Duplicate email
         if users_collection.find_one({"email": email}):
             flash("Email already exists!", "warning")
             return redirect("/admin/add_resident")
@@ -46,7 +57,7 @@ def add_resident():
             "name": name,
             "email": email,
             "phone": phone,
-            "flat": flat,
+            "tower": tower,   # 🔥 store tower
             "role": "resident"
         })
 
@@ -55,8 +66,8 @@ def add_resident():
 
     return render_template(
         "admin/admin_add_resident.html",
-        flats=flats   # 🔽 send to HTML
-    ) 
+        towers=towers
+    )
 
 
 # =========================

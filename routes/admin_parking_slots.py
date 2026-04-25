@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect
+from flask import Blueprint, render_template, request, redirect
 from db import db
 from bson.objectid import ObjectId
 
@@ -15,27 +15,22 @@ users_collection = db["users"]
 @admin_parking_slot_bp.route("/admin/parking_slots")
 def manage_slots():
 
-    # 🔥 all slots
     slots = list(slots_collection.find())
 
-    # 🔥 pending requests
     pending_requests = list(
         requests_collection.find({"status": "pending"})
     )
 
-    # 🔥 pending slot numbers
     pending_slot_numbers = [
         r.get("slot_number") for r in pending_requests
     ]
 
-    # 🔥 mark pending status in slots
     for slot in slots:
         slot["status"] = slot.get("status", "available")
 
         if slot["slot_number"] in pending_slot_numbers:
             slot["status"] = "pending"
 
-    # 🔥 split slots
     normal_slots = [
         s for s in slots if s["status"] != "pending"
     ]
@@ -45,6 +40,75 @@ def manage_slots():
         normal_slots=normal_slots,
         requests=pending_requests
     )
+
+
+# =========================
+# ADD SLOT
+# =========================
+@admin_parking_slot_bp.route("/admin/add_parking_slot", methods=["GET", "POST"])
+def add_slot():
+
+    if request.method == "POST":
+
+        slot_data = {
+            "slot_number": request.form.get("slot_number"),
+            "tower": request.form.get("tower"),
+            "floor": request.form.get("floor"),
+            "slot_type": request.form.get("slot_type"),
+            "status": "available",
+            "resident_name": "",
+            "user_name": "",
+            "vehicle_number": ""
+        }
+
+        slots_collection.insert_one(slot_data)
+
+        return redirect("/admin/parking_slots")
+
+    return render_template("admin/admin_add_parking_slot.html")
+
+
+# =========================
+# EDIT SLOT
+# =========================
+@admin_parking_slot_bp.route("/admin/edit_parking_slot/<id>", methods=["GET", "POST"])
+def edit_slot(id):
+
+    slot = slots_collection.find_one({"_id": ObjectId(id)})
+
+    if request.method == "POST":
+
+        user_name = request.form.get("user_name", "")
+        vehicle_number = request.form.get("vehicle_number", "")
+
+        status = "occupied" if user_name else "available"
+
+        slots_collection.update_one(
+            {"_id": ObjectId(id)},
+            {
+                "$set": {
+                    "user_name": user_name,
+                    "resident_name": user_name,
+                    "vehicle_number": vehicle_number,
+                    "status": status
+                }
+            }
+        )
+
+        return redirect("/admin/parking_slots")
+
+    return render_template("admin/admin_edit_parking_slot.html", slot=slot)
+
+
+# =========================
+# DELETE SLOT
+# =========================
+@admin_parking_slot_bp.route("/admin/delete_slot/<id>")
+def delete_slot(id):
+
+    slots_collection.delete_one({"_id": ObjectId(id)})
+
+    return redirect("/admin/parking_slots")
 
 
 # =========================
@@ -58,7 +122,6 @@ def approve_request(id):
     if req:
         slot_number = req.get("slot_number")
 
-        # 🔥 update slot → occupied
         slots_collection.update_one(
             {"slot_number": slot_number},
             {
@@ -71,7 +134,6 @@ def approve_request(id):
             }
         )
 
-        # 🔥 update request → approved
         requests_collection.update_one(
             {"_id": ObjectId(id)},
             {"$set": {"status": "approved"}}
@@ -91,7 +153,6 @@ def reject_request(id):
     if req:
         slot_number = req.get("slot_number")
 
-        # 🔥 reset slot → available
         slots_collection.update_one(
             {"slot_number": slot_number},
             {
@@ -104,7 +165,6 @@ def reject_request(id):
             }
         )
 
-        # 🔥 update request → rejected
         requests_collection.update_one(
             {"_id": ObjectId(id)},
             {"$set": {"status": "rejected"}}
