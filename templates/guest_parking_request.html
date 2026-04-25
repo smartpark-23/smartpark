@@ -9,7 +9,7 @@
 
 <style>
 body{
-    background:url("https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=1600&q=80") no-repeat center center/cover;
+    background:url("https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=1600&q=80") no-repeat center/cover;
     min-height:100vh;
     font-family:'Segoe UI';
     position:relative;
@@ -22,55 +22,32 @@ body::before{
     position:absolute;
     inset:0;
     background:rgba(0,0,0,0.65);
-    z-index:0;
 }
 
+/* WRAPPER */
 .wrapper{
     position:relative;
     z-index:1;
 }
 
-/* ================= NAVBAR ================= */
+/* NAVBAR */
 .header{
     display:flex;
     justify-content:space-between;
     align-items:center;
-    flex-wrap:wrap;
     padding:18px 40px;
     background:rgba(255,255,255,0.08);
     backdrop-filter:blur(14px);
-    border-bottom:1px solid rgba(255,255,255,0.12);
 }
 
-.logo{
-    font-size:28px;
-    font-weight:700;
-}
-
-.nav-links a{
-    text-decoration:none;
-    color:white;
-    margin:8px 10px;
-    padding:8px 15px;
-    border-radius:12px;
-    transition:0.3s;
-    display:inline-block;
-}
-
-.nav-links a:hover{
-    background:rgba(255,255,255,0.12);
-}
-
-/* FORM SECTION */
+/* FORM */
 .form-section{
     display:flex;
     justify-content:center;
     align-items:center;
     min-height:calc(100vh - 80px);
-    padding:20px;
 }
 
-/* FORM BOX */
 .form-box{
     background:rgba(255,255,255,0.12);
     backdrop-filter:blur(18px);
@@ -78,15 +55,6 @@ body::before{
     border-radius:25px;
     width:100%;
     max-width:600px;
-    box-shadow:0 10px 30px rgba(0,0,0,0.35);
-}
-
-/* TITLE */
-.form-title{
-    font-size:28px;
-    font-weight:700;
-    margin-bottom:20px;
-    text-align:center;
 }
 
 /* INPUT */
@@ -98,14 +66,10 @@ body::before{
     border-radius:12px;
 }
 
-.form-control::placeholder{
-    color:#e5e7eb;
-}
-
-.form-control:focus{
-    background:rgba(255,255,255,0.2);
-    color:white;
-    box-shadow:none;
+/* DATE ICON FIX */
+input[type="date"]::-webkit-calendar-picker-indicator{
+    filter: invert(1);
+    cursor: pointer;
 }
 
 /* SLOT BOX */
@@ -113,32 +77,14 @@ body::before{
     background:rgba(255,255,255,0.08);
     padding:18px;
     border-radius:15px;
-    margin-bottom:20px;
-}
-
-.form-check{
-    margin-bottom:10px;
-}
-
-.form-check-label{
-    color:white;
-    margin-left:8px;
 }
 
 /* BUTTON */
 .btn-send{
     background:#22c55e;
     color:white;
-    font-weight:600;
-    border:none;
     padding:14px;
     border-radius:12px;
-    transition:0.3s;
-}
-
-.btn-send:hover{
-    background:#16a34a;
-    transform:translateY(-2px);
 }
 </style>
 </head>
@@ -147,83 +93,61 @@ body::before{
 
 <div class="wrapper">
 
-    <!-- ================= NAVBAR (ADDED) ================= -->
-    <div class="header">
-        <div class="logo">SMARTPARK</div>
+<div class="header">
+    <div class="logo">SMARTPARK</div>
+</div>
 
-        <div class="nav-links">
-            <a href="/">Home</a>
-            <a href="/slots">Slots</a>
-            <a href="/guest-parking">Guest Parking</a>
-            <a href="/guest-access">Track Request</a>
-            <a href="/login">Login</a>
-            <a href="/register" class="register-btn">Register</a>
-        </div>
+<div class="form-section">
+<div class="form-box">
+
+<h3 class="text-center mb-3">🚗 Guest Parking Request</h3>
+
+<form method="POST">
+
+<input type="text" name="guest_name" class="form-control mb-3" placeholder="Guest Name" required>
+<input type="text" name="mobile_number" class="form-control mb-3" placeholder="Mobile Number" required>
+<input type="text" name="vehicle_number" class="form-control mb-3" placeholder="Vehicle Number" required>
+<input type="text" name="resident_name" class="form-control mb-3" placeholder="Resident Name / Flat No" required>
+
+<!-- DATE WITH ICON -->
+<div class="mb-3">
+    <label>Visit Date</label>
+    <input type="date" name="visit_date" class="form-control" required>
+</div>
+
+<label class="mb-2">Available Slots</label>
+
+<div class="slot-box">
+
+{% if free_slots and free_slots|length > 0 %}
+
+    {% for slot in free_slots %}
+    <div class="form-check">
+        <input class="form-check-input"
+            type="checkbox"
+            name="selected_slots"
+            value="{{ slot.slot_number }}">
+
+        <label class="form-check-label">
+            {{ slot.slot_number }} ({{ slot.slot_type }})
+        </label>
     </div>
+    {% endfor %}
 
-    <!-- ================= FORM ================= -->
-    <div class="form-section">
-        <div class="form-box">
+{% else %}
+    <p style="color:#ff6b6b;">❌ No slots available</p>
+{% endif %}
 
-            <div class="form-title">
-                🚗 Guest Parking Request
-            </div>
+</div>
 
-            <form method="POST">
+<button class="btn btn-send w-100 mt-3">
+    Send Request
+</button>
 
-                <input type="text" name="guest_name"
-                    class="form-control mb-3"
-                    placeholder="Guest Name" required>
+</form>
 
-                <input type="text" name="mobile_number"
-                    class="form-control mb-3"
-                    placeholder="Mobile Number" required>
-
-                <input type="text" name="vehicle_number"
-                    class="form-control mb-3"
-                    placeholder="Vehicle Number" required>
-
-                <input type="text" name="resident_name"
-                    class="form-control mb-3"
-                    placeholder="Resident Name / Flat No" required>
-
-                <input type="date" name="visit_date"
-                    class="form-control mb-3" required>
-
-                <label class="mb-2">Select Available Slots</label>
-
-                <div class="slot-box">
-
-                    {% if free_slots %}
-                        {% for slot in free_slots %}
-                            <div class="form-check">
-                                <input class="form-check-input"
-                                    type="checkbox"
-                                    name="selected_slots"
-                                    value="{{ slot.slot_number }}"
-                                    id="{{ slot.slot_number }}">
-
-                                <label class="form-check-label"
-                                    for="{{ slot.slot_number }}">
-                                    {{ slot.slot_number }}
-                                    ({{ slot.slot_type }})
-                                </label>
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <p>No slots available</p>
-                    {% endif %}
-
-                </div>
-
-                <button class="btn btn-send w-100">
-                    Send Request
-                </button>
-
-            </form>
-
-        </div>
-    </div>
+</div>
+</div>
 
 </div>
 
